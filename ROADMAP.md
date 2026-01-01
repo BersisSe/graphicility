@@ -1,4 +1,8 @@
 # Graphiclity Roadmap : Planned Features in Upcoming versions
-✅ = _Means Complete_
 
 ---
+
+- Better Docs
+- Polish the Internals
+- Extensiblity API
+
