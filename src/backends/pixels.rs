@@ -10,15 +10,13 @@ pub struct PixelsBackend {
 
 impl PixelsBackend {
     pub(crate) fn new(
-        window: &winit::window::Window, // Pass window ref to create SurfaceTexture
+        window: &winit::window::Window,
         window_size: PhysicalSize<u32>,
         logic_size: LogicalSize<u32>,
     ) -> Self {
         // Create a surface texture that maps the logical buffer to the physical window
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, window);
 
-        // Initialize pixels at the LOGICAL size.
-        // The GPU will handle the upscaling to the physical window automatically.
         let pixels: Pixels =
             PixelsBuilder::new(logic_size.width, logic_size.height, surface_texture)
                 .enable_vsync(true)
@@ -38,7 +36,7 @@ impl PixelsBackend {
         for c in text.chars() {
             let char_code = c as usize;
 
-            // FONT8X8_BASIC covers ASCII 0-127
+            // Using FONT8X8_BASIC covers ASCII 0-127
             if char_code >= crate::text::FONT8X8_BASIC.len() {
                 cursor_x += 8;
                 continue;
@@ -74,7 +72,7 @@ impl PixelsBackend {
         }
     }
 
-    /// Optimized: Draws a rectangle using row-based slice filling
+    
     fn draw_rect(&mut self, x: u32, y: u32, w: u32, h: u32, color: Color) {
         // 1. Calculate boundaries using saturating math to prevent overflow panics
         let x1 = x;
@@ -107,7 +105,6 @@ impl PixelsBackend {
         }
     }
     fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: Color) {
-        // Bresenham's line algorithm
         let dx = (x1 - x0).abs();
         let sx = if x0 < x1 { 1 } else { -1 };
         let dy = -(y1 - y0).abs();
@@ -151,8 +148,6 @@ impl PixelsBackend {
     }
 
     pub fn resize_window(&mut self, size: PhysicalSize<u32>) {
-        // We only resize the SURFACE (how it's displayed), not the BUFFER (the internal pixels)
-        // This maintains your retro aspect ratio regardless of window size.
         if let Err(err) = self.pixels.resize_surface(size.width, size.height) {
             eprintln!("Pixels resize_surface failed: {}", err);
         }

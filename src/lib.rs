@@ -14,6 +14,7 @@ use winit::event_loop::EventLoop;
 /// Contains logical and physical sizes  <br>
 /// Logical size is your drawing canvas size
 /// Physical size is the actual window size on screen  
+/// Defaults to 800x600 logical and physical sizes
 pub struct Config {
     /// Window Title
     pub title: String,
@@ -102,13 +103,31 @@ impl Default for Config {
 }
 
 /// Run the application with default configuration
+///```rust
+/// run(|g|{
+///   // your drawing code here
+/// });
+/// ```
 pub fn run<F>(app: F)
 where
     F: FnMut(&mut Graphics),
 {
     run_with(Config::default(), app);
 }
+
 /// Run the application with custom configuration
+/// Example:
+/// ```rust
+/// let config = Config::builder()
+///    .with_title("My App")
+///    .set_window_size((1024, 768))
+///    .set_logical_size((800, 600))
+///    .set_resizeable(true)
+///  .build();
+/// run_with(config, |g|{
+///   // your drawing code here
+/// });
+/// ```
 pub fn run_with<F>(config: Config, app: F)
 where
     F: FnMut(&mut Graphics),

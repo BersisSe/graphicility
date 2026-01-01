@@ -9,6 +9,8 @@ use crate::Config;
 use crate::backends::PixelsBackend;
 use crate::graphics::Graphics;
 
+/// The main runtime struct that manages the application lifecycle
+/// It holds the configuration, window, graphics context, rendering backend, and the user-defined drawing function.
 pub struct Runtime<F> {
     config: Config,
     window: Option<Window>,
@@ -42,15 +44,11 @@ where
         let attrs = WindowAttributes::default()
             .with_title(&config.title)
             .with_resizable(config.resizeable)         
-           // Use LogicalSize - winit will handle DPI scaling
             .with_inner_size(PhysicalSize::new(config.window_width, config.window_height));
 
         let window = event_loop.create_window(attrs).unwrap();
 
-        // IMPORTANT: Get the actual physical size AFTER window creation
         let physical_size = window.inner_size();
-
-        // Logical size is always from config (your drawing canvas)
         let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
 
         self.backend = Some(PixelsBackend::new(&window, physical_size, logical_size));

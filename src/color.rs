@@ -20,10 +20,11 @@ impl Color {
     pub const MAGENTA: Color = Color::rgb(255, 0, 255);
     
 
-
+    /// Create a Color from RGB values
     pub const fn rgb(r: u8, g: u8, b: u8) -> Color{
         Color { r, g, b, a: 255 }
     }
+    /// Create a Color from RGBA values
     pub const fn rgba(r: u8, g: u8, b: u8, a: f32) -> Color{
         // turn the 0.0-1.0 alpha into 0-255 u8
         let a = (a.clamp(0.0, 1.0) * 255.0) as u8;
