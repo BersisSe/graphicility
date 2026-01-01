@@ -2,12 +2,12 @@ use graphiclity::{Color, Config};
 
 fn main() {
     let conf = Config {
-        title: "Text Test".to_string(),
         resizeable: false,
         logical_width: 320,
         logical_height: 240,
         window_width: 640,
         window_height: 480,
+        ..Default::default()
     };
     
     let mut x: i32 = 50;
