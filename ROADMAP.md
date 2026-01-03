@@ -30,7 +30,7 @@ This roadmap outlines planned improvements while keeping the core small, explici
 ### Extensibility API
 - Introduce a **minimal and optional** extensibility layer
 - Expose a stable drawing command boundary
-- Allow external systems (interpreters, emulators, tools) to drive rendering
+- Allow external libraries hook up to the internals
 - Keep `run` / `run_with` simple and unchanged
 
 This API is intended for Building on top Graphiclity. Eg. Widget Systems, UI Frameworks, Layout Engines

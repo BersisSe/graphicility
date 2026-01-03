@@ -10,13 +10,14 @@ mod config;
 pub use graphics::Graphics;
 pub use color::Color;
 pub use config::Config;
+pub use input::Input;
+
 // Re-Exports from winit events
 pub use winit::keyboard::KeyCode;
 pub use winit::event::MouseButton;
 
 use context::WindowContext;
 use runtime::Runtime;
-use input::Input;
 
 use winit::event_loop::EventLoop;
 
