@@ -7,6 +7,7 @@ use winit_input_helper::WinitInputHelper;
 
 use crate::Graphics;
 
+/// This is the Main Window Input Interface.
 pub struct Input {
     pub(crate) helper: WinitInputHelper,
     mouse_logical: Option<(f32,f32)>,

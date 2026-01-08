@@ -8,7 +8,7 @@ use winit::window::{Window, WindowAttributes, WindowId};
 
 use crate::Config;
 use crate::backends::PixelsBackend;
-use crate::context::WindowContext;
+use crate::context::FrameContext;
 use crate::graphics::Graphics;
 use crate::input::Input;
 
@@ -17,7 +17,7 @@ use crate::input::Input;
 pub struct Runtime<F> {
     config: Config,
     window: Option<Window>,
-    context: Option<WindowContext>,
+    context: Option<FrameContext>,
     backend: Option<PixelsBackend>,
     draw_fn: F,
     last_frame_time: Instant,
@@ -26,7 +26,7 @@ pub struct Runtime<F> {
 
 impl<F> Runtime<F>
 where
-    F: FnMut(&mut WindowContext),
+    F: FnMut(&mut FrameContext),
 {
     pub fn new(draw_fn: F, config: Config) -> Self {
         let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
@@ -41,7 +41,7 @@ where
         Self {
             config,
             window: None,
-            context: Some(WindowContext::new(graphics, inputs)),
+            context: Some(FrameContext::new(graphics, inputs)),
             backend: None,
             draw_fn: draw_fn,
             last_frame_time: Instant::now(),
@@ -52,7 +52,7 @@ where
 
 impl<F> ApplicationHandler for Runtime<F>
 where
-    F: FnMut(&mut WindowContext),
+    F: FnMut(&mut FrameContext),
 {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         let config = &self.config;

@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A lot more examples!
 
 ### Changed
-- `run` and `run_with` now take a WindowContext Closure instead of Graphics **this change is Breaking**.
+- `run` and `run_with` now take a FrameContext Closure instead of Graphics **this change is Breaking**.
 - defaults for `Config` struct logical and physical sized changed from 800x600 to 1280x800 physical & 640&400 logical sizes
 - All of `Graphics` drawing functions now accept `Into<Vec2>`
 - Most of the Internal Doc Comments are Refactored

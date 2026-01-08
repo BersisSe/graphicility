@@ -37,6 +37,7 @@ pub enum DrawCommand {
     },
 }
 
+/// This is the Main Drawing interface.
 pub struct Graphics {
     commands: Vec<DrawCommand>,
     logic_width: u32,

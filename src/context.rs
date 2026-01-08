@@ -1,14 +1,15 @@
 use crate::{Graphics, Input};
 
-pub struct WindowContext {
+/// Represents the data in the Frame
+pub struct FrameContext {
     pub(crate) gfx: Graphics,
     pub(crate) inputs: Input,
     pub(crate) dt: f64,
 }
 
-impl WindowContext {
+impl FrameContext {
     pub(crate) fn new(gfx : Graphics, inputs: Input) -> Self {
-        WindowContext {
+        FrameContext {
             gfx,
             inputs,
             dt: 0.0

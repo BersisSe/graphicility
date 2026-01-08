@@ -1,3 +1,4 @@
+/// Simple rgb/rgba color structure
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Color {
     pub r: u8,

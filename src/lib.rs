@@ -3,11 +3,12 @@
 //! A minimal, immediate-mode 2D drawing library designed for simplicity and ease of use.
 //!
 //! Graphiclity provides a higher-level interface around `pixels` and `winit`, offering a
-//! logical pixel buffer that automatically handles scaling and DPI.
+//! logical pixel buffer that automatically handles scaling and DPI. <br>
+//! Allowing you to create simple graphical applications.
 //!
 //! ## Core Concepts
 //!
-//! - **[WindowContext]**: The primary interface provided to your draw loop. It contains
+//! - **[FrameContext]**: The primary interface provided to your draw loop. It contains
 //!   access to [Graphics], [Input], and timing data.
 //! - **Logical Resolution**: You define a fixed "Virtual resolution" (e.g., 320x240). 
 //!   The library scales this to fit the physical window.
@@ -15,8 +16,7 @@
 //!   allowing you to pass `(x, y)` tuples directly.
 //! - **Immediate Mode** : You define the graphics and you see it _immediately_
 //! ## Some Examples
-//! 
-
+#![doc = include_str!("docs/examples.md")]
 
 mod backends;
 mod color;
@@ -29,6 +29,7 @@ mod config;
 mod vector;
 
 pub use graphics::Graphics;
+pub use context::FrameContext;
 pub use color::Color;
 pub use config::Config;
 pub use input::Input;
@@ -38,7 +39,6 @@ pub use vector::Vec2;
 pub use winit::keyboard::KeyCode;
 pub use winit::event::MouseButton;
 
-use context::WindowContext;
 use runtime::Runtime;
 
 use winit::event_loop::EventLoop;
@@ -53,7 +53,7 @@ use winit::event_loop::EventLoop;
 /// ```
 pub fn run<F>(app: F)
 where
-    F: FnMut(&mut WindowContext),
+    F: FnMut(&mut FrameContext),
 {
     run_with(Config::default(), app);
 }
@@ -73,7 +73,7 @@ where
 /// ```
 pub fn run_with<F>(config: Config, app: F)
 where
-    F: FnMut(&mut WindowContext),
+    F: FnMut(&mut FrameContext),
 {
     let event_loop = EventLoop::new().unwrap();
     let mut app = Runtime::new(app, config);
