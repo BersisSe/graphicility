@@ -20,6 +20,7 @@ This roadmap outlines planned improvements while keeping the core small, explici
 
 ### Input System ✅
 - Solid, frame-based input handling
+- Mouse and Keyboard inputs
 
 ---
 
@@ -33,4 +34,10 @@ This roadmap outlines planned improvements while keeping the core small, explici
 
 This API is intended for Building on top Graphiclity. Eg. UI Frameworks, Game Frameworks, Layout Engines, Widget Systems,
 
+### Better Text System
+- Support for .tff fonts 
+- Add a simple Text Renderer
+
+### Wgpu Backend
+- Pure Performant wgpu based backend for rendering
 ---
