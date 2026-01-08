@@ -1,5 +1,8 @@
-use winit::event::MouseButton;
-use winit::keyboard::KeyCode;
+use std::collections::HashSet;
+
+use winit::event::{MouseButton, KeyEvent};
+use winit::keyboard::{KeyCode, PhysicalKey};
+
 use winit_input_helper::WinitInputHelper;
 
 use crate::Graphics;
@@ -7,6 +10,11 @@ use crate::Graphics;
 pub struct Input {
     pub(crate) helper: WinitInputHelper,
     mouse_logical: Option<(f32,f32)>,
+    
+    // Key Tracking
+    keys_pressed: HashSet<PhysicalKey>,
+    keys_released: HashSet<PhysicalKey>,
+    keys_held: HashSet<PhysicalKey>,
 }
 
 impl Input {
@@ -14,24 +22,51 @@ impl Input {
         Self {
             helper: WinitInputHelper::new(),
             mouse_logical: None,
+            keys_pressed: HashSet::new(),
+            keys_released: HashSet::new(),
+            keys_held: HashSet::new(),
         }
+    }
+
+    /// Process a keyboard event directly
+    pub(crate) fn process_key_event(&mut self, event: &KeyEvent) {
+        let physical_key = event.physical_key;
+        
+        match event.state {
+            winit::event::ElementState::Pressed => {
+                if !self.keys_held.contains(&physical_key) {
+                    self.keys_pressed.insert(physical_key);
+                }
+                self.keys_held.insert(physical_key);
+            }
+            winit::event::ElementState::Released => {
+                self.keys_held.remove(&physical_key);
+                self.keys_released.insert(physical_key);
+            }
+        }
+    }
+
+    /// Clear transient input state (pressed/released) for the next frame
+    pub(crate) fn reset_transient_state(&mut self) {
+        self.keys_pressed.clear();
+        self.keys_released.clear();
     }
 
     // ? Keyboard
 
     /// Returns true while the key is held down
     pub fn key_down(&self, key: KeyCode) -> bool {
-        self.helper.key_held(key)
+        self.keys_held.iter().any(|&k| k == PhysicalKey::Code(key))
     }
 
     /// Returns true only on the frame the key was pressed
     pub fn key_pressed(&self, key: KeyCode) -> bool {
-        self.helper.key_pressed(key)
+        self.keys_pressed.iter().any(|&k| k == PhysicalKey::Code(key))
     }
 
     /// Returns true only on the frame the key was released
     pub fn key_released(&self, key: KeyCode) -> bool {
-        self.helper.key_released(key)
+        self.keys_released.iter().any(|&k| k == PhysicalKey::Code(key))
     }
 
     // ? Mouse

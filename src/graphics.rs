@@ -42,8 +42,8 @@ pub struct Graphics {
     logic_width: u32,
     logic_height: u32,
 
-    window_width: u32,
-    window_height: u32,
+    pub(crate) window_width: u32,
+    pub(crate) window_height: u32,
 }
 
 impl Graphics {

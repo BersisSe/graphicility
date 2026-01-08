@@ -21,6 +21,7 @@ pub struct Runtime<F> {
     backend: Option<PixelsBackend>,
     draw_fn: F,
     last_frame_time: Instant,
+    input_stepped: bool,
 }
 
 impl<F> Runtime<F>
@@ -44,6 +45,7 @@ where
             backend: None,
             draw_fn: draw_fn,
             last_frame_time: Instant::now(),
+            input_stepped: false,
         }
     }
 }
@@ -75,53 +77,49 @@ where
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        self.context
+        // Process keyboard events
+        if let WindowEvent::KeyboardInput { event, .. } = &event {
+            self.context
+                .as_mut()
+                .unwrap()
+                .inputs
+                .process_key_event(event);
+        }
+
+        if self
+            .context
             .as_mut()
             .unwrap()
             .inputs
             .helper
-            .process_window_event(&event);
+            .process_window_event(&event)
+        {
+            let context = self.context.as_mut().unwrap();
+            let renderer = self.backend.as_mut().unwrap();
+            renderer.render(context.gfx.commands())
+        }
         match event {
             WindowEvent::CloseRequested => {
                 event_loop.exit();
-            }
-            WindowEvent::RedrawRequested => {
-                let now = Instant::now();
-                let frame_time = now.duration_since(self.last_frame_time);
-                self.last_frame_time = now; // Update immediately
-
-                let mut context = self.context.as_mut().unwrap();
-                let renderer = self.backend.as_mut().unwrap();
-
-                let mut dt = frame_time.as_secs_f64();
-
-                // If dt is huge (window move), treat it as a "pause and resume"
-                // rather than trying to jump forward.
-                if dt > 0.1 {
-                    dt = 1.0 / self.config.target_fps.unwrap_or(60) as f64;
-                }
-                context.inputs.update_mouse_mapping(&context.gfx);
-                context.dt = dt;
-                context.gfx.begin_frame();
-                (self.draw_fn)(&mut context);
-                renderer.render(context.gfx.commands());
             }
             WindowEvent::Resized(physical_size) => {
                 if physical_size.width == 0 || physical_size.height == 0 {
                     return;
                 }
+
                 if let Some(renderer) = &mut self.backend {
                     renderer.resize_window(physical_size);
                 }
+
+                let ctx = self.context.as_mut().unwrap();
+                ctx.gfx.window_width = physical_size.width;
+                ctx.gfx.window_height = physical_size.height;
             }
 
             _ => (),
         }
     }
 
-    fn new_events(&mut self, _: &ActiveEventLoop, _: winit::event::StartCause) {
-        self.context.as_mut().unwrap().inputs.helper.step();
-    }
     fn device_event(
         &mut self,
         _: &ActiveEventLoop,
@@ -136,23 +134,43 @@ where
             .process_device_event(&event);
     }
 
-    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-        self.context.as_mut().unwrap().inputs.helper.end_step();
-        if let Some(win) = &self.window {
-            if let Some(target_fps) = self.config.target_fps {
-                let frame_duration = Duration::from_secs_f64(1.0 / target_fps as f64);
-                let elapsed = self.last_frame_time.elapsed();
+    // Mark frame start for input handling
+    fn new_events(&mut self, _: &ActiveEventLoop, _: winit::event::StartCause) {
+        self.input_stepped = false;
+    }
 
-                if elapsed >= frame_duration {
-                    win.request_redraw();
-                } else {
-                    event_loop.set_control_flow(winit::event_loop::ControlFlow::WaitUntil(
-                        Instant::now() + (frame_duration - elapsed),
-                    ));
-                }
+    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        if let Some(win) = &self.window {
+            if !self.input_stepped {
+                self.context.as_mut().unwrap().inputs.helper.step();
+                self.input_stepped = true;
+            }
+
+            let mut context = self.context.as_mut().unwrap();
+            let elapsed = self.last_frame_time.elapsed();
+
+            let should_run = if let Some(target_fps) = self.config.target_fps {
+                elapsed >= Duration::from_secs_f64(1.0 / target_fps as f64)
             } else {
-                // Uncapped behavior
+                true
+            };
+
+            if should_run {
+                context.dt = elapsed.as_secs_f64().min(0.1);
+                self.last_frame_time = Instant::now();
+
+                context.inputs.update_mouse_mapping(&context.gfx);
+                context.gfx.begin_frame();
+                (self.draw_fn)(&mut context);
+
+                context.inputs.helper.end_step();
+                context.inputs.reset_transient_state();
                 win.request_redraw();
+            } else if let Some(target_fps) = self.config.target_fps {
+                let frame_duration = Duration::from_secs_f64(1.0 / target_fps as f64);
+                event_loop.set_control_flow(winit::event_loop::ControlFlow::WaitUntil(
+                    Instant::now() + (frame_duration - elapsed),
+                ));
             }
         }
     }
