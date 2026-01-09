@@ -1,8 +1,8 @@
-//! # Graphiclity
+//! # Graphicility
 //!
 //! A minimal, immediate-mode 2D drawing library designed for simplicity and ease of use.
 //!
-//! Graphiclity provides a higher-level interface around `pixels` and `winit`, offering a
+//! Graphicility provides a higher-level interface around `pixels` and `winit`, offering a
 //! logical pixel buffer that automatically handles scaling and DPI. <br>
 //! Allowing you to create simple graphical applications.
 //!

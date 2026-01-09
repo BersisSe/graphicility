@@ -64,7 +64,7 @@ impl ConfigBuilder {
     /// Build the Config
     pub fn build(self) -> Config {
         Config {
-            title: self.title.unwrap_or("Graphiclity Window".to_string()),
+            title: self.title.unwrap_or("Graphicility Window".to_string()),
             resizeable: self.resizeable.unwrap_or(true),
             logical_width: self.logical_width.unwrap_or(640),
             logical_height: self.logical_height.unwrap_or(400),
@@ -92,7 +92,7 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            title: "Graphiclity Window".to_string(),
+            title: "Graphicility Window".to_string(),
             resizeable: true,
             logical_width: 640,
             logical_height: 400,

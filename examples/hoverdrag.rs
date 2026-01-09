@@ -1,11 +1,11 @@
-use graphiclity::{Color, Vec2};
+use graphicility::{Color, Vec2};
 
 fn main() {
     // Typed Vectors
     let mut box_pos = Vec2 { x: 100, y: 100 };
     let box_size = Vec2 { x: 50, y: 50 };
 
-    graphiclity::run( move |ctx| {
+    graphicility::run( move |ctx| {
         let (g, input) = ctx.split();
         // Clear screen to black
         g.clear(Color::BLACK);
@@ -24,7 +24,7 @@ fn main() {
                 color = Color::RED;
                 
                 // If clicking, drag the box!
-                if input.mouse_down(graphiclity::MouseButton::Left) {
+                if input.mouse_down(graphicility::MouseButton::Left) {
                     box_pos.x = x - box_size.x / 2;
                     box_pos.y = y - box_size.y / 2;
                 }

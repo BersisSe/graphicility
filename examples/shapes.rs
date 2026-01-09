@@ -1,9 +1,9 @@
-use graphiclity::{Color, Config,};
+use graphicility::{Color, Config,};
 
 fn main() {
     let conf = Config::builder().with_title("Geometry").build();
 
-    graphiclity::run_with(conf, |ctx| {
+    graphicility::run_with(conf, |ctx| {
         let g= ctx.graphics();
         g.clear(Color::rgb(30, 30, 45)); // Dark navy background
         
@@ -39,7 +39,7 @@ fn main() {
         );
 
         // 6. Text Labels
-        g.text((220, 10), "Graphiclity Shapes Demo", Color::WHITE);
+        g.text((220, 10), "Graphicility Shapes Demo", Color::WHITE);
     });
 }
 

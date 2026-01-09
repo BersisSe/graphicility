@@ -1,4 +1,4 @@
-use graphiclity::{Color, Config, Vec2};
+use graphicility::{Color, Config, Vec2};
 
 fn main() {
     let conf = Config {
@@ -16,7 +16,7 @@ fn main() {
     let mut vel = Vec2 { x: 2, y: 3 };
     let size = Vec2 { x: 20, y: 20 };
 
-    graphiclity::run_with(conf, move |ctx| {
+    graphicility::run_with(conf, move |ctx| {
         let dt = ctx.delta_time();
         let g = ctx.graphics();
 
@@ -41,7 +41,7 @@ fn main() {
         g.rect(pos, size, Color::rgb(128, 23, 255));
 
         // Lastly, lest draw some UI
-        g.text((10, 10), "Graphiclity v0.2.0", Color::CYAN);
+        g.text((10, 10), "Graphicility v0.2.0", Color::CYAN);
         g.text((10, height as i32 - 20), format!("Pos: {}, {}", pos.x, pos.y), Color::BLACK);
         
     });

@@ -1,9 +1,9 @@
-    use graphiclity::{Color, Config};
+    use graphicility::{Color, Config};
 
     fn main() {
         let conf = Config::default();
 
-        graphiclity::run_with(conf, |ctx| {
+        graphicility::run_with(conf, |ctx| {
             let (g, input) = ctx.split();
             g.clear(Color::BLACK);
 

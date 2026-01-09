@@ -1,10 +1,10 @@
-use graphiclity::{Color, KeyCode};
+use graphicility::{Color, KeyCode};
 
 fn main() {
     let mut x = 100.0;
     let mut y = 100.0;
 
-    graphiclity::run(|ctx| {
+    graphicility::run(|ctx| {
         let dt = ctx.delta_time(); // Getthe delta time. its important to call this before `split`
         let (g, input) = ctx.split();
 

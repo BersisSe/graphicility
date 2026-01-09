@@ -1,16 +1,16 @@
-# Graphiclity: A Minimal Graphics Library
+# Graphicility: A Minimal Graphics Library
 
-Graphiclity is a minimal graphics library that makes drawing pixels to a window simple.
+Graphicility is a minimal graphics library that makes drawing pixels to a window simple.
 
 If you've ever tried to draw pixels to a window in Rust for example, for a CHIP-8 emulator you know the pain. Using `iced` or `egui` often feels like overkill, while `wgpu` + `winit` feels far too low-level.
 
-**_Graphiclity_ exists to bridge that gap.**
+**_Graphicility_ exists to bridge that gap.**
 
 It provides a small, immediate-mode drawing API on top of a window and render loop, without forcing a UI framework or architectural style.
 
 ---
 
-## Graphiclity is not!
+## Graphicility is not!
 
 - A UI framework
 - A widget or layout system
@@ -19,7 +19,7 @@ It provides a small, immediate-mode drawing API on top of a window and render lo
 - An alternative for `iced` or `egui`
 - A replacement for `wgpu`
 
-If you need those things, Graphiclity is probably not the right tool and that’s okay, it doesn't have to be.
+If you need those things, Graphicility is probably not the right tool and that’s okay, it doesn't have to be.
 
 ---
 
@@ -37,7 +37,7 @@ If you need those things, Graphiclity is probably not the right tool and that’
 ### Basic Drawing
 
 ```rust
-use graphiclity::{run, Color};
+use Graphicility::{run, Color};
 
 fn main() {
     run(|ctx| {
@@ -53,13 +53,13 @@ fn main() {
 ### And A bouncing Rect
 
 ```rust
-use graphiclity::Color;
+use Graphicility::Color;
 fn main() {
     let mut pos = Vec2 { x: 50, y: 50 };
     let mut vel = Vec2 { x: 2, y: 3 };
     let size = Vec2 { x: 20, y: 20 };
 
-    graphiclity::run_with(conf, move |ctx| {
+    Graphicility::run_with(conf, move |ctx| {
         let dt = ctx.delta_time();
         let g = ctx.graphics();
 
@@ -79,7 +79,7 @@ fn main() {
 
         g.rect(pos, size, Color::rgb(128, 23, 255));
 
-        g.text((10, 10), "Graphiclity v0.2.0", Color::CYAN);
+        g.text((10, 10), "Graphicility v0.2.0", Color::CYAN);
         g.text((10, height as i32 - 20), format!("Pos: {}, {}", pos.x, pos.y), Color::BLACK);
 
     });
@@ -90,18 +90,18 @@ fn main() {
 
 ---
 
-## When to use Graphiclity?
+## When to use Graphicility?
 
 - Developing a Emulator(Especially a Retro one) = Perfect ✅
 - Developing Software in Rust that needs basic Graphical Output = Perfect ✅
-- Developing a UI Framework taking Graphiclity as a foundation = Plausible ⚠️(Extensibility API is not yet implemented)
+- Developing a UI Framework taking Graphicility as a foundation = Plausible ⚠️(Extensibility API is not yet implemented)
 - Developing a Full fledged Game or a Desktop Application = Nope ❌ You'll struggle and will need to implement most of the things by yourself
 
 ---
 
 ## How it works
 
-Internally, Graphiclity handles:
+Internally, Graphicility handles:
 
 - Window creation and events
 - A simple render loop
@@ -109,13 +109,13 @@ Internally, Graphiclity handles:
 - DPI Controls
 
 You control **what** is drawn.
-Graphiclity handles **how** it appears on screen.
+Graphicility handles **how** it appears on screen.
 
 ---
 
 ## Philosophy
 
-Graphiclity is designed to be the **first mile** of graphics in Rust.
+Graphicility is designed to be the **first mile** of graphics in Rust.
 
 It favors:
 
@@ -129,15 +129,15 @@ Drawing a rectangle should not require hundreds of lines of setup.
 
 ## Limitations
 
-- **No low-level access**: Graphiclity intentionally hides renderer internals to keep things simple
+- **No low-level access**: Graphicility intentionally hides renderer internals to keep things simple
 - **Letterboxing**: The current backend (Pixels 0.14) adds black bars when window aspect ratio doesn't match logical resolution
   - **Solution**: Use matching aspect ratios (e.g., logical 320×240 with window 640×480, both 4:3)
-- **No audio**: Graphiclity is graphics-only
+- **No audio**: Graphicility is graphics-only
 - **Single window**: One window per application
 
 ## Status
 
-Graphiclity is currently under heavy development.
+Graphicility is currently under heavy development.
 APIs may change as the library is refined through real-world use.
 
 ## Final Notes

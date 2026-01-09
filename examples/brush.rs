@@ -1,9 +1,9 @@
-use graphiclity::{Color, MouseButton, KeyCode};
+use graphicility::{Color, MouseButton, KeyCode};
 
 fn main() {
     let mut points: Vec<(i32, i32)> = vec![];
 
-    graphiclity::run( move |ctx| {
+    graphicility::run( move |ctx| {
         let (g, input) = ctx.split();
         // Clear the screen
         g.clear(Color::rgb(20, 20, 20));

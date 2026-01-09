@@ -1,4 +1,4 @@
-# Graphiclity Roadmap
+# Graphicility Roadmap
 
 This roadmap outlines planned improvements while keeping the core small, explicit, and approachable.
 ✅ = Means Complete
@@ -32,7 +32,7 @@ This roadmap outlines planned improvements while keeping the core small, explici
 - Allow external libraries hook up to the internals
 - Keep `run` / `run_with` simple and unchanged
 
-This API is intended for Building on top Graphiclity. Eg. UI Frameworks, Game Frameworks, Layout Engines, Widget Systems,
+This API is intended for Building on top Graphicility. Eg. UI Frameworks, Game Frameworks, Layout Engines, Widget Systems,
 
 ### Better Text System
 - Support for .tff fonts 

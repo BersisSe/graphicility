@@ -1,19 +1,19 @@
-# Contributing to Graphiclity
+# Contributing to Graphicility
 
-Thank you for your interest in Graphiclity!
+Thank you for your interest in Graphicility!
 This document explains **how to contribute**, and just as importantly, **where certain ideas belong**.
 
-Graphiclity is intentionally minimal. Not every good idea belongs in the core library and that’s by design.
+Graphicility is intentionally minimal. Not every good idea belongs in the core library and that’s by design.
 
 ---
 
-## Two Ways to Build with Graphiclity
+## Two Ways to Build with Graphicility
 
-There are **two different ways** to contribute to Graphiclity. Choose the one that fits your goal.
+There are **two different ways** to contribute to Graphicility. Choose the one that fits your goal.
 
 ---
 
-## 1. Building _on top of_ Graphiclity (Extensions)
+## 1. Building _on top of_ Graphicility (Extensions)
 
 If you want to:
 
@@ -23,22 +23,22 @@ If you want to:
 - Experiment with alternative APIs
 - Provide domain-specific tools (emulators, tooling, etc.)
 
-**Do NOT submit a PR to Graphiclity core.**
+**Do NOT submit a PR to Graphicility core.**
 
 Instead:
 
 - Use the **public API**
 - Use the **Extensibility API** (when available)
-- Create a **separate crate** that depends on `graphiclity`
+- Create a **separate crate** that depends on `Graphicility`
 
 ### Why?
 
-Graphiclity aims to stay small and stable.
+Graphicility aims to stay small and stable.
 Extensions allow experimentation **without increasing core complexity**.
 
 This approach:
 
-- Keeps Graphiclity focused
+- Keeps Graphicility focused
 - Prevents breaking changes for downstream users
 - Encourages innovation without fragmentation
 
@@ -46,7 +46,7 @@ This approach:
 
 ---
 
-## 2. Contributing to Graphiclity Core (Internal Changes)
+## 2. Contributing to Graphicility Core (Internal Changes)
 
 If you want to:
 
@@ -61,7 +61,7 @@ If you want to:
 
 ### Guidelines for Core Contributions
 
-- Changes must align with Graphiclity’s philosophy:
+- Changes must align with Graphicility’s philosophy:
   - Minimal
   - Explicit
   - Immediate-mode
@@ -83,11 +83,11 @@ Everything else:
 
 If you depend on internal behavior, you should:
 
-- Fork Graphiclity
+- Fork Graphicility
 
 ---
 
-## What Graphiclity Will Not Accept
+## What Graphicility Will Not Accept
 
 To avoid confusion, the following will **not** be accepted into core:
 
@@ -98,7 +98,7 @@ To avoid confusion, the following will **not** be accepted into core:
 - Retained-mode rendering
 - ECS or scene graphs
 
-These are better implemented **on top of Graphiclity**, not inside it.
+These are better implemented **on top of Graphicility**, not inside it.
 
 ---
 
