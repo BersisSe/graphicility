@@ -65,7 +65,6 @@ If your extension needs to expose **mutable state or controls to the user at run
 The extension owns the state.
 The user holds a cloneable handle to it.
 
----
 
 ### Basic Pattern
 
