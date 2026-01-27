@@ -183,6 +183,21 @@ impl PixelsBackend {
         if let Err(err) = self.pixels.resize_surface(size.width, size.height) {
             eprintln!("Pixels resize_surface failed: {}", err);
         }
+        // Also resize the buffer to match window aspect ratio (eliminates letterboxing)
+        let new_logical_width = size.width / 2;
+        let new_logical_height = size.height / 2;
+        if new_logical_width > 0 && new_logical_height > 0 {
+            if let Err(err) = self.pixels.resize_buffer(new_logical_width, new_logical_height) {
+                eprintln!("Pixels resize_buffer failed: {}", err);
+            }
+            self.logic_width = new_logical_width;
+            self.logic_height = new_logical_height;
+        }
+    }
+
+    /// Get the current logical size
+    pub fn logical_size(&self) -> (u32, u32) {
+        (self.logic_width, self.logic_height)
     }
 
     pub fn render(&mut self, commands: &[DrawCommand]) {

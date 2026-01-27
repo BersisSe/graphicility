@@ -82,13 +82,19 @@ impl ConfigBuilder {
     
     /// Build the Config
     pub fn build(self) -> Config {
+        let window_width = self.window_width.unwrap_or(1280);
+        let window_height = self.window_height.unwrap_or(800);
+        // Default logical size to half of window size to ensure matching aspect ratio (no letterboxing)
+        let logical_width = self.logical_width.unwrap_or(window_width / 2);
+        let logical_height = self.logical_height.unwrap_or(window_height / 2);
+        
         Config {
             title: self.title.unwrap_or("Graphicility Window".to_string()),
             resizeable: self.resizeable.unwrap_or(true),
-            logical_width: self.logical_width.unwrap_or(640),
-            logical_height: self.logical_height.unwrap_or(400),
-            window_width: self.window_width.unwrap_or(1280),
-            window_height: self.window_height.unwrap_or(800),
+            logical_width,
+            logical_height,
+            window_width,
+            window_height,
             target_fps: self.target_fps,
             #[cfg(feature = "extension")]
             extensions: self.extensions.unwrap_or(Vec::new()),

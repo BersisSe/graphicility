@@ -139,6 +139,10 @@ where
 
                 if let Some(renderer) = &mut self.backend {
                     renderer.resize_window(physical_size);
+                    // Sync new logical size to graphics context
+                    let (lw, lh) = renderer.logical_size();
+                    let ctx = self.context.as_mut().unwrap();
+                    ctx.gfx.set_logical_size(lw, lh);
                 }
 
                 let ctx = self.context.as_mut().unwrap();
