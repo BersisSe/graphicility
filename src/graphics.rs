@@ -75,6 +75,11 @@ impl Graphics {
     pub fn window_size(&self) -> (u32, u32) {
         (self.window_width, self.window_height)
     }
+    /// Update the logical size (used internally when window is resized)
+    pub(crate) fn set_logical_size(&mut self, width: u32, height: u32) {
+        self.logic_width = width;
+        self.logic_height = height;
+    }
     /// Clear the screen with a color  
     /// You should call this at the start of each frame to clear the previous frame's drawings
     pub fn clear(&mut self, color: Color) {
