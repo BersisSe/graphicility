@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ## Added
+- New `letterboxing` field to Config.
+- New `use_letterboxing` method in the ConfigBuilder
+
+## Changed
+- The Letterboxing behavior observed in the renderer now can be toggled via config. Thanks to [PR from "CheeseBugles"](https://github.com/BersisSe/graphicility/pull/1)
+
+
+
+## [0.3.0] - 2026-01-22
+## Added
 - `Rect` Type for typed shape geometry and simpler bounds checks.
 - `Extension` Trait to implement custom Extensions that will connect into applications lifecycle.
 - Config now has a `Extensions` field for registering Extensions

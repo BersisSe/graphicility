@@ -130,8 +130,6 @@ Drawing a rectangle should not require hundreds of lines of setup.
 ## Limitations
 
 - **No low-level access**: Graphicility intentionally hides renderer internals to keep things simple
-- **Letterboxing**: The current backend (Pixels 0.14) adds black bars when window aspect ratio doesn't match logical resolution
-  - **Solution**: Use matching aspect ratios (e.g., logical 320×240 with window 640×480, both 4:3)
 - **No audio**: Graphicility is graphics-only
 - **Single window**: One window per application
 

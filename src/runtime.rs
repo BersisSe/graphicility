@@ -104,7 +104,7 @@ where
         let physical_size = window.inner_size();
         let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
 
-        self.backend = Some(PixelsBackend::new(&window, physical_size, logical_size));
+        self.backend = Some(PixelsBackend::new(&window, physical_size, logical_size, config.letterboxing));
         self.window = Some(window);
     }
 

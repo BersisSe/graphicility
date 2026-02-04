@@ -6,6 +6,7 @@ pub struct PixelsBackend {
     pixels: Pixels,
     logic_width: u32,
     logic_height: u32,
+    use_letterboxing: bool
 }
 
 impl PixelsBackend {
@@ -13,8 +14,8 @@ impl PixelsBackend {
         window: &winit::window::Window,
         window_size: PhysicalSize<u32>,
         logic_size: LogicalSize<u32>,
+        use_letterboxing: bool
     ) -> Self {
-        // Create a surface texture that maps the logical buffer to the physical window
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, window);
 
         let pixels: Pixels =
@@ -27,6 +28,7 @@ impl PixelsBackend {
             pixels,
             logic_height: logic_size.height,
             logic_width: logic_size.width,
+            use_letterboxing,
         }
     }
     fn draw_text(&mut self, pos: Vec2, text: &str, color: Color) {
@@ -37,7 +39,7 @@ impl PixelsBackend {
         for c in text.chars() {
             let char_code = c as usize;
 
-            // Using FONT8X8_BASIC covers ASCII 0-127
+            // Using FONT8X8_BASIC covers ASCII 0-127.
             if char_code >= crate::text::FONT8X8_BASIC.len() {
                 cursor_x += 8;
                 continue;
@@ -45,18 +47,18 @@ impl PixelsBackend {
 
             let glyph = &crate::text::FONT8X8_BASIC[char_code];
 
-            // Draw each row of the 8x8 character
+            // Draw each row of the 8x8 character.
             for row in 0..8 {
                 let byte = glyph[row];
 
-                // Draw each pixel in the row
+                // Draw each pixel in the row.
                 for col in 0..8 {
-                    // Check if this bit is set
+                    // Check if this bit is set.
                     if (byte & (1 << col)) != 0 {
                         let px = cursor_x + col;
                         let py = cursor_y + row as u32;
 
-                        // Only draw if within bounds
+                        // Only draw if within bounds.
                         if (px as u32) < self.logic_width
                             && (py as u32) < self.logic_height
                         {
@@ -183,16 +185,21 @@ impl PixelsBackend {
         if let Err(err) = self.pixels.resize_surface(size.width, size.height) {
             eprintln!("Pixels resize_surface failed: {}", err);
         }
-        // Also resize the buffer to match window aspect ratio (eliminates letterboxing)
-        let new_logical_width = size.width / 2;
-        let new_logical_height = size.height / 2;
-        if new_logical_width > 0 && new_logical_height > 0 {
-            if let Err(err) = self.pixels.resize_buffer(new_logical_width, new_logical_height) {
-                eprintln!("Pixels resize_buffer failed: {}", err);
+
+        if !self.use_letterboxing{
+            // Also resize the buffer to match window aspect ratio (eliminates letterboxing)
+            let new_logical_width = size.width / 2;
+            let new_logical_height = size.height / 2;
+            if new_logical_width > 0 && new_logical_height > 0 {
+                if let Err(err) = self.pixels.resize_buffer(new_logical_width, new_logical_height) {
+                    eprintln!("Pixels resize_buffer failed: {}", err);
+                }
+                self.logic_width = new_logical_width;
+                self.logic_height = new_logical_height;
             }
-            self.logic_width = new_logical_width;
-            self.logic_height = new_logical_height;
         }
+        
+        
     }
 
     /// Get the current logical size

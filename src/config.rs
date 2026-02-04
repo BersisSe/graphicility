@@ -20,6 +20,10 @@ pub struct Config {
     pub window_width: u32,
     pub window_height: u32,
 
+    /// Toggles the Letterboxing in the rendering engine.
+    ///  If true graphics are centered when the window changes sizes but black bars might appear,
+    ///  if false graphics will not be centered when the window size grows.
+    pub letterboxing: bool,
     /// Fps
     pub target_fps: Option<u32>,
 
@@ -39,6 +43,10 @@ pub struct ConfigBuilder {
     window_height: Option<u32>,
     /// Fps
     target_fps: Option<u32>,
+    /// Toggles the Letterboxing in the rendering engine.
+    ///  If true graphics are centered when the window changes sizes but black bars might appear,
+    ///  if false graphics will not be centered when the window size grows.
+    letterboxing: bool,
     /// Extensions
     #[cfg(feature = "extension")]
     extensions: Option<Vec<Box<dyn Extension>>>,
@@ -70,6 +78,15 @@ impl ConfigBuilder {
         self.resizeable = Some(resizeable);
         self
     }
+
+    /// Toggles the Letterboxing in the rendering engine. <br>
+    ///  If true graphics are centered when the window changes sizes but black bars might appear,
+    ///  if false graphics will not be centered when the window size grows.
+    pub fn use_letterboxing(mut self, change_to: bool) -> Self{
+        self.letterboxing = change_to;
+        self
+    }
+
     /// Register a single extension
     #[cfg(feature = "extension")]
     pub fn with_extension<Ext: Extension + 'static>(mut self, ext: Ext) -> Self {
@@ -95,6 +112,7 @@ impl ConfigBuilder {
             logical_height,
             window_width,
             window_height,
+            letterboxing: self.letterboxing,
             target_fps: self.target_fps,
             #[cfg(feature = "extension")]
             extensions: self.extensions.unwrap_or(Vec::new()),
@@ -111,6 +129,7 @@ impl Config {
             window_width: None,
             resizeable: None,
             title: None,
+            letterboxing: false,
             target_fps: None,
             #[cfg(feature = "extension")]
             extensions: None,
@@ -127,6 +146,7 @@ impl Default for Config {
             logical_height: 400,
             window_width: 1280,
             window_height: 800,
+            letterboxing: false,
             target_fps: Some(60),
             #[cfg(feature = "extension")]
             extensions: Vec::new(),
