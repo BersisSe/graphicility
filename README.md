@@ -14,7 +14,6 @@ It provides a small, immediate-mode drawing API on top of a window and render lo
 
 - A UI framework
 - A widget or layout system
-- A retained scene graph
 - A game engine
 - An alternative for `iced` or `egui`
 - A replacement for `wgpu`
