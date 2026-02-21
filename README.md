@@ -1,6 +1,6 @@
 # Graphicility: A Minimal Graphics Library
 
-Graphicility is a minimal graphics library that makes drawing pixels to a window simple.
+Graphicility(pronounced "Grah-fih-kill-ih-tee") is a minimal graphics library that makes drawing pixels to a window simple.
 
 If you've ever tried to draw pixels to a window in Rust for example, for a CHIP-8 emulator you know the pain. Using `iced` or `egui` often feels like overkill, while `wgpu` + `winit` feels far too low-level.
 
