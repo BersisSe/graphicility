@@ -8,7 +8,7 @@ use winit::window::{Window, WindowAttributes, WindowId};
 use winit_input_helper::WinitInputHelper;
 
 use crate::Config;
-use crate::backends::PixelsBackend;
+use crate::backends::{Backend, PixelsBackend};
 use crate::context::FrameContext;
 use crate::graphics::Graphics;
 use crate::input::Input;
@@ -18,11 +18,11 @@ use crate::extensions::Extension;
 
 /// The main runtime struct that manages the application lifecycle
 /// It holds the configuration, window, graphics context, rendering backend, and the user-defined drawing function.
-pub struct Runtime<F> {
+pub struct Runtime<F, B: Backend = PixelsBackend> {
     config: Config,
     window: Option<Window>,
     context: Option<FrameContext>,
-    backend: Option<PixelsBackend>,
+    backend: Option<B>,
     draw_fn: F,
     last_frame_time: Instant,
     input_stepped: bool,
@@ -30,9 +30,10 @@ pub struct Runtime<F> {
     extensions: Vec<Box<dyn Extension>>
 }
 
-impl<F> Runtime<F>
+impl<F, B> Runtime<F,B>
 where
     F: FnMut(&mut FrameContext),
+    B: Backend
 {
     pub(crate) fn get_input_helper(&mut self) -> &mut WinitInputHelper {
         &mut self.context.as_mut().unwrap().inputs.helper

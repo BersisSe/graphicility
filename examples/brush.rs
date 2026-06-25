@@ -1,9 +1,10 @@
-use graphicility::{Color, MouseButton, KeyCode};
+use graphicility::{Color, KeyCode, MouseButton};
 
 fn main() {
-    let mut points: Vec<(i32, i32)> = vec![];
+    // Track points and point breaks
+    let mut points: Vec<Option<(i32, i32)>> = vec![];
 
-    graphicility::run( move |ctx| {
+    graphicility::run(move |ctx| {
         let (g, input) = ctx.split();
         // Clear the screen
         g.clear(Color::rgb(20, 20, 20));
@@ -11,8 +12,12 @@ fn main() {
         // Add points while clicking
         if input.mouse_down(MouseButton::Left) {
             if let Some((mx, my)) = input.mouse_pos() {
-                points.push((mx as i32, my as i32));
+                points.push(Some((mx as i32, my as i32)));
             }
+        }
+        // And add a point break when the mouse is released
+        if input.mouse_released(MouseButton::Left) {
+            points.push(None);
         }
 
         // Clear canvas with Space
@@ -20,11 +25,18 @@ fn main() {
             points.clear();
         }
 
-        // Draw the trail
-        for p in &points {
-            g.pixel(*p, Color::YELLOW);
+        // Draw the trail as lines this makes a better brush
+        for pair in points.windows(2) {
+            if let (Some(a), Some(b)) = (pair[0], pair[1]) {
+                g.line(a, b, Color::YELLOW);
+            }
         }
 
-        g.text((10, 10), "Left Click to Draw | Space to Clear", Color::WHITE);
-    });
+        g.text(
+            (10, 10),
+            "Left Click to Draw - Space to Clear",
+            Color::WHITE,
+        );
+    })
+    .unwrap();
 }

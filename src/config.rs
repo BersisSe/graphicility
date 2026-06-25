@@ -62,19 +62,19 @@ impl ConfigBuilder {
         self
     }
     /// Set the window size (physical size)
-    pub fn set_window_size(mut self, size: (u32, u32)) -> Self {
+    pub fn with_window_size(mut self, size: (u32, u32)) -> Self {
         self.window_width = Some(size.0);
         self.window_height = Some(size.1);
         self
     }
     /// Set the logical size (drawing canvas size)
-    pub fn set_logical_size(mut self, size: (u32, u32)) -> Self {
+    pub fn with_logical_size(mut self, size: (u32, u32)) -> Self {
         self.logical_width = Some(size.0);
         self.logical_height = Some(size.1);
         self
     }
     /// Sets the window resizeablity.
-    pub fn set_resizeable(mut self, resizeable: bool) -> Self {
+    pub fn resizeable(mut self, resizeable: bool) -> Self {
         self.resizeable = Some(resizeable);
         self
     }

@@ -3,7 +3,7 @@ use graphicility::{Color, Config, Vec2};
 fn main() {
     let conf = Config::builder()
         .with_title("Bouncing Rect")
-        .set_resizeable(false)
+        .resizeable(false)
         .with_target_fps(60)
         .build();
 

@@ -12,8 +12,8 @@
                 let mouse_pos = (mx as i32, my as i32);
                 
                 // Draw a "glow" effect with nested circles
-                g.circle(mouse_pos, 40, Color::rgba(0, 255, 255, 0.3));
-                g.circle(mouse_pos, 20, Color::rgba(0, 255, 255, 0.6));
+                g.circle(mouse_pos, 40, Color::rgba(0, 255, 255, 20));
+                g.circle(mouse_pos, 20, Color::rgba(0, 255, 255, 60));
                 g.circle(mouse_pos, 5, Color::CYAN);
                 
                 g.text((mx as i32 + 10, my as i32 + 10), format!("X: {} Y: {}", mx, my), Color::WHITE);

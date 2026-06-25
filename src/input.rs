@@ -1,17 +1,17 @@
 use std::collections::HashSet;
 
-use winit::event::{MouseButton, KeyEvent};
+use winit::event::{KeyEvent, MouseButton};
 use winit::keyboard::{KeyCode, PhysicalKey};
 
 use winit_input_helper::WinitInputHelper;
 
-use crate::Graphics;
+use crate::{Graphics, Rect};
 
 /// This is the Main Window Input Interface.
 pub struct Input {
     pub(crate) helper: WinitInputHelper,
-    mouse_logical: Option<(f32,f32)>,
-    
+    mouse_logical: Option<(f32, f32)>,
+
     // Key Tracking
     keys_pressed: HashSet<PhysicalKey>,
     keys_released: HashSet<PhysicalKey>,
@@ -32,7 +32,7 @@ impl Input {
     /// Process a keyboard event directly
     pub(crate) fn process_key_event(&mut self, event: &KeyEvent) {
         let physical_key = event.physical_key;
-        
+
         match event.state {
             winit::event::ElementState::Pressed => {
                 if !self.keys_held.contains(&physical_key) {
@@ -62,12 +62,16 @@ impl Input {
 
     /// Returns true only on the frame the key was pressed
     pub fn key_pressed(&self, key: KeyCode) -> bool {
-        self.keys_pressed.iter().any(|&k| k == PhysicalKey::Code(key))
+        self.keys_pressed
+            .iter()
+            .any(|&k| k == PhysicalKey::Code(key))
     }
 
     /// Returns true only on the frame the key was released
     pub fn key_released(&self, key: KeyCode) -> bool {
-        self.keys_released.iter().any(|&k| k == PhysicalKey::Code(key))
+        self.keys_released
+            .iter()
+            .any(|&k| k == PhysicalKey::Code(key))
     }
 
     // ? Mouse
@@ -78,7 +82,7 @@ impl Input {
 
             let x = mx * lw as f32 / ww as f32;
             let y = my * lh as f32 / wh as f32;
-            return (x , y);
+            return (x, y);
         });
     }
     /// Returns true if the MouseButton is down in the current frame.
@@ -94,10 +98,13 @@ impl Input {
         self.helper.mouse_released(button)
     }
     /// Returns the current Mouse position as `f32 Tuple` containg X&Y cordinates. <br>
-    /// While window is unfocused it will return `None`
+    /// While window is unfocused it will return `None`.  <br>,
     /// _Note : Mouse Positions need to be precise thats why we didn't use Vec2 here!_
     pub fn mouse_pos(&self) -> Option<(f32, f32)> {
         self.mouse_logical
+    }
+    pub fn scroll_delta(&self) -> (f32, f32) {
+        self.helper.scroll_diff()
     }
 
     // ? Window Related
@@ -107,8 +114,20 @@ impl Input {
             .window_resized()
             .map(|size| (size.width, size.height))
     }
-    
+
     pub fn window_close_requested(&self) -> bool {
         self.helper.close_requested()
+    }
+
+    //? Higher Level Helpers!
+    pub fn mouse_over(&self, rect: &Rect) -> bool {
+        match self.mouse_logical {
+            Some((x, y)) => rect.contains((x as i32, y as i32).into()),
+            None => false,
+        }
+    }
+
+    pub fn mouse_clicked(&self, rect: &Rect) -> bool {
+        self.mouse_over(rect) && self.mouse_pressed(MouseButton::Left)
     }
 }

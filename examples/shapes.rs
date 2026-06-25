@@ -8,8 +8,8 @@ fn main() {
         g.clear(Color::rgb(30, 30, 45)); // Dark navy background
         
         // 1. Lines: Drawing a simple grid or crosshair
-        g.line((320, 0), (320, 400), Color::rgba(255, 255, 255, 0.2));
-        g.line((0, 200), (640, 200), Color::rgba(255, 255, 255, 0.2));
+        g.line((320, 0), (320, 400), Color::rgba(255, 255, 255, 20));
+        g.line((0, 200), (640, 200), Color::rgba(255, 255, 255, 20));
 
         // 2. Rectangles: Outline vs standard blocks
         // Bottom left square

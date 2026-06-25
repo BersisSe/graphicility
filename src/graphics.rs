@@ -5,6 +5,12 @@ use crate::vector::Vec2;
 
 pub enum DrawCommand {
     Clear(Color),
+    DrawBlit {
+        pos: Vec2,
+        width: u32,
+        height: u32,
+        pixels: Vec<Color>,
+    },
     Pixel {
         pos: Vec2,
         color: Color,
@@ -18,17 +24,20 @@ pub enum DrawCommand {
         pos: Vec2,
         size: Vec2,
         color: Color,
+        filled: bool,
     },
-    Circle{
-        center : Vec2,
+    Circle {
+        center: Vec2,
         radius: i32,
         color: Color,
+        filled: bool,
     },
     Triangle {
         p1: Vec2,
         p2: Vec2,
         p3: Vec2,
         color: Color,
+        filled: bool,
     },
     Text {
         pos: Vec2,
@@ -87,11 +96,11 @@ impl Graphics {
     }
     /// Draw a single pixel to a given Point as a [Vec2]
     pub fn pixel(&mut self, pos: impl Into<Vec2>, color: Color) {
-        let p = pos.into(
-            
-        );
+        let p = pos.into();
         // Internal guard check
-        if p.x < 0 || p.y < 0 { return; }
+        if p.x < 0 || p.y < 0 {
+            return;
+        }
 
         self.commands.push(DrawCommand::Pixel { pos: p, color });
     }
@@ -103,26 +112,104 @@ impl Graphics {
             color,
         });
     }
+    // Draw a raw pixel buffer at `pos`.
+    /// `pixels` must be exactly `width * height` colors in row-major order (left→right, top→bottom).
+    /// Panics in debug if the slice length doesn't match.
+    pub fn blit(&mut self, pos: impl Into<Vec2>, width: u32, height: u32, pixels: &[Color]) {
+        debug_assert_eq!(
+            pixels.len(),
+            (width * height) as usize,
+            "blit: pixels.len() must equal width * height"
+        );
+        if width == 0 || height == 0 {
+            return;
+        }
+
+        self.commands.push(DrawCommand::DrawBlit {
+            pos: pos.into(),
+            width,
+            height,
+            pixels: pixels.to_vec(),
+        });
+    }
+    /// Draw a filled Rectangle on `pos` with a given `size`.
+    pub fn rect_lines(&mut self, pos: impl Into<Vec2>, size: impl Into<Vec2>, color: Color) {
+        let p = pos.into();
+        let s = size.into();
+
+        // We can still do your negative clipping logic here easily
+        if s.x <= 0 || s.y <= 0 {
+            return;
+        }
+
+        self.commands.push(DrawCommand::Rect {
+            pos: p,
+            size: s,
+            color,
+            filled: false,
+        });
+    }
     /// Draw a filled Rectangle on `pos` with a given `size`.
     pub fn rect(&mut self, pos: impl Into<Vec2>, size: impl Into<Vec2>, color: Color) {
         let p = pos.into();
         let s = size.into();
-        
-        // We can still do your negative clipping logic here easily
-        if s.x <= 0 || s.y <= 0 { return; }
 
-        self.commands.push(DrawCommand::Rect { pos: p, size: s, color });
+        if s.x <= 0 || s.y <= 0 {
+            return;
+        }
+
+        self.commands.push(DrawCommand::Rect {
+            pos: p,
+            size: s,
+            color,
+            filled: true,
+        });
     }
-    pub fn circle(&mut self, center: impl Into<Vec2>, radius: i32, color : Color){
-        self.commands.push(DrawCommand::Circle { center: center.into(), radius,  color});
+    pub fn circle(&mut self, center: impl Into<Vec2>, radius: i32, color: Color) {
+        self.commands.push(DrawCommand::Circle {
+            center: center.into(),
+            radius,
+            color,
+            filled: false,
+        });
+    }
+    pub fn circle_filled(&mut self, center: impl Into<Vec2>, radius: i32, color: Color) {
+        self.commands.push(DrawCommand::Circle {
+            center: center.into(),
+            radius,
+            color,
+            filled: true,
+        });
     }
     /// Draw a Hollow Triangle using the given 3 points.
-    pub fn triangle(&mut self, p1: impl Into<Vec2>, p2: impl Into<Vec2>, p3: impl Into<Vec2>, color: Color) {
+    pub fn triangle(
+        &mut self,
+        p1: impl Into<Vec2>,
+        p2: impl Into<Vec2>,
+        p3: impl Into<Vec2>,
+        color: Color,
+    ) {
         self.commands.push(DrawCommand::Triangle {
             p1: p1.into(),
             p2: p2.into(),
             p3: p3.into(),
             color,
+            filled: false,
+        });
+    }
+    pub fn triangle_filled(
+        &mut self,
+        p1: impl Into<Vec2>,
+        p2: impl Into<Vec2>,
+        p3: impl Into<Vec2>,
+        color: Color,
+    ) {
+        self.commands.push(DrawCommand::Triangle {
+            p1: p1.into(),
+            p2: p2.into(),
+            p3: p3.into(),
+            color,
+            filled: true,
         });
     }
     /// Draw text at `pos` with the specified color using the internal 8x8 bitmap font
@@ -132,5 +219,5 @@ impl Graphics {
             text: text.into(),
             color,
         });
-    }   
+    }
 }
