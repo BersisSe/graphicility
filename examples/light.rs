@@ -20,5 +20,5 @@
             }
 
             g.text((10, 10), "Move mouse to shine the light", Color::WHITE);
-        });
+        }).unwrap();
     }

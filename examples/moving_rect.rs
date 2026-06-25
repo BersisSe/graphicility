@@ -22,5 +22,5 @@ fn main() {
         g.clear(Color::BLACK);
         g.rect((x as i32, y as i32), (20, 20), Color::CYAN);
         g.text((10, 10), "WASD to move, Space to Dash", Color::WHITE);
-    });
+    }).unwrap();
 }

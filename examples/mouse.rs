@@ -7,5 +7,5 @@ fn main() {
         if input.mouse_pressed(graphicility::MouseButton::Left){
             println!("adsa");
         }
-    });
+    }).unwrap();
 }

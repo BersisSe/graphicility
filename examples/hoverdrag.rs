@@ -33,5 +33,5 @@ fn main() {
 
         g.rect(box_pos, box_size, color);
         g.text((10, 10), "Hover to highlight, Click to drag", Color::WHITE);
-    });
+    }).unwrap();
 }

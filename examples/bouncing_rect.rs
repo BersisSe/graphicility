@@ -40,5 +40,5 @@ fn main() {
         g.text((10, 10), "Graphicility v0.3.0", Color::CYAN);
         g.text((10, height as i32 - 20), format!("Pos: {}, {}", pos.x, pos.y), Color::BLACK);
         
-    });
+    }).unwrap();
 }

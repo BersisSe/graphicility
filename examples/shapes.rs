@@ -40,6 +40,6 @@ fn main() {
 
         // 6. Text Labels
         g.text((220, 10), "Graphicility Shapes Demo", Color::WHITE);
-    });
+    }).unwrap();
 }
 
