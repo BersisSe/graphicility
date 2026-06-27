@@ -31,6 +31,7 @@ If you need those things, Graphicility is probably not the right tool - and that
 - ✅ Automatic DPI scaling
 - ✅ Fixed logical resolution (perfect for pixel-art and emulators)
 - ✅ Resizable windows with aspect ratio preservation
+- ✅ Full loop control via the `Window` API
 - ✅ Zero-setup: just call `run()` and start drawing
 
 ---
@@ -41,7 +42,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-graphicility = "0.4"
+graphicility = "0.5"
 ```
 
 ---
@@ -63,6 +64,28 @@ fn main() {
 ```
 
 ![drawing](./assets/drawing_demo.png)
+
+---
+
+### Window API
+
+For emulators, simulators, or anything that needs full control over the loop,
+use `Window` directly instead of `run()`.
+
+```rust
+use graphicility::{Window, Color};
+
+fn main() {
+    let mut win = Window::new(Default::default()).unwrap();
+
+    while win.is_running() {
+        let frame = win.next_frame();
+        frame.graphics().clear(Color::BLACK);
+        frame.graphics().rect((5, 5), (10, 10), Color::RED);
+        win.end_frame();
+    }
+}
+```
 
 ---
 
