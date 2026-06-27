@@ -526,7 +526,7 @@ dependencies = [
 
 [[package]]
 name = "graphicility"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "pixels",
  "winit",

@@ -8,8 +8,8 @@ fn main() {
         let dt = ctx.delta_time(); // Getthe delta time. its important to call this before `split`
         let (g, input) = ctx.split();
 
-        
-        if input.key_down(KeyCode::KeyW) { y -= 150.0 * dt; } // Move the recteangle using 150 speed and delta
+        // Move the recteangle using 150 speed and delta
+        if input.key_down(KeyCode::KeyW) { y -= 150.0 * dt; } 
         if input.key_down(KeyCode::KeyS) { y += 150.0 * dt; }
         if input.key_down(KeyCode::KeyA) { x -= 150.0 * dt; }
         if input.key_down(KeyCode::KeyD) { x += 150.0 * dt; }

@@ -4,7 +4,7 @@ use winit::application::ApplicationHandler;
 use winit::dpi::{LogicalSize, PhysicalSize};
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
-use winit::window::{Window, WindowAttributes, WindowId};
+use winit::window::{WindowAttributes, WindowId};
 use winit_input_helper::WinitInputHelper;
 
 use crate::Config;
@@ -16,82 +16,131 @@ use crate::input::Input;
 #[cfg(feature = "extension")]
 use crate::extensions::Extension;
 
-/// The main runtime struct that manages the application lifecycle
-/// It holds the configuration, window, graphics context, rendering backend, and the user-defined drawing function.
-pub struct Runtime<F, B: Backend = PixelsBackend> {
-    config: Config,
-    window: Option<Window>,
-    context: Option<FrameContext>,
-    backend: Option<B>,
-    draw_fn: F,
-    last_frame_time: Instant,
-    input_stepped: bool,
+/// Internal state machine for the window and rendering pipeline.
+/// This no longer holds the draw function — that's the caller's responsibility.
+pub struct Runtime<B: Backend = PixelsBackend> {
+    pub(crate) config: Config,
+    pub(crate) window: Option<winit::window::Window>,
+    pub(crate) context: Option<FrameContext>,
+    pub(crate) backend: Option<B>,
+    pub(crate) last_frame_time: Instant,
+    pub(crate) input_stepped: bool,
+    pub(crate) running: bool,
     #[cfg(feature = "extension")]
-    extensions: Vec<Box<dyn Extension>>
+    pub(crate) extensions: Vec<Box<dyn Extension>>,
 }
 
-impl<F, B> Runtime<F,B>
-where
-    F: FnMut(&mut FrameContext),
-    B: Backend
-{
+impl<B: Backend> Runtime<B> {
     pub(crate) fn get_input_helper(&mut self) -> &mut WinitInputHelper {
         &mut self.context.as_mut().unwrap().inputs.helper
     }
-    #[cfg(not(feature = "extension"))]
-    pub fn new(draw_fn: F, config: Config) -> Self {
-        let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
-        
-        let graphics = Graphics::new(
-            logical_size,
-            PhysicalSize::new(config.window_width, config.window_height),
-        );
 
-        let inputs = Input::new();
-
-        Self {
-            config,
-            window: None,
-            context: Some(FrameContext::new(graphics, inputs)),
-            backend: None,
-            draw_fn: draw_fn,
-            last_frame_time: Instant::now(),
-            input_stepped: false,
-        }
+    pub fn is_running(&self) -> bool {
+        self.running
     }
 
-    #[cfg(feature = "extension")]
-    pub fn new(draw_fn: F, mut config: Config) -> Self {
-        let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
-        // Move the extensions out of the config early
-        
-        let mut extensions = std::mem::take(&mut config.extensions); // Take the extensions out of config
-        extensions.iter_mut().for_each(|ext|ext.on_init());
-        let graphics = Graphics::new(
-            logical_size,
-            PhysicalSize::new(config.window_width, config.window_height),
-        );
+    /// Call this at the start of every frame.
+    /// Returns None if it's not yet time to render (e.g. FPS cap not reached).
+    pub fn begin_frame(&mut self) -> Option<&mut FrameContext> {
+        let elapsed = self.last_frame_time.elapsed();
 
-        let inputs = Input::new();
+        let should_run = if let Some(target_fps) = self.config.target_fps {
+            elapsed >= Duration::from_secs_f64(1.0 / target_fps as f64)
+        } else {
+            true
+        };
 
-        Self {
-            config,
-            window: None,
-            context: Some(FrameContext::new(graphics, inputs)),
-            backend: None,
-            draw_fn: draw_fn,
-            last_frame_time: Instant::now(),
-            input_stepped: false,
-            #[cfg(feature = "extension")]
-            extensions: extensions
+        if !should_run {
+            return None;
+        }
+
+        let context = self.context.as_mut().unwrap();
+        context.dt = elapsed.as_secs_f64().min(0.1);
+        self.last_frame_time = Instant::now();
+
+        context.inputs.update_mouse_mapping(&context.gfx);
+        context.gfx.begin_frame();
+
+        #[cfg(feature = "extension")]
+        for ext in &mut self.extensions {
+            ext.pre_draw(context);
+        }
+
+        Some(self.context.as_mut().unwrap())
+    }
+
+    /// Call this at the end of every frame after drawing.
+    pub fn end_frame(&mut self) {
+        let context = self.context.as_mut().unwrap();
+
+        #[cfg(feature = "extension")]
+        for ext in &mut self.extensions {
+            ext.post_draw(context);
+        }
+
+        context.inputs.helper.end_step();
+        context.inputs.reset_transient_state();
+        self.input_stepped = false;
+
+        if let Some(win) = &self.window {
+            win.request_redraw();
         }
     }
 }
 
-impl<F> ApplicationHandler for Runtime<F>
-where
-    F: FnMut(&mut FrameContext),
-{
+#[cfg(not(feature = "extension"))]
+impl Runtime {
+    pub fn new(config: Config) -> Self {
+        let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
+
+        let graphics = Graphics::new(
+            logical_size,
+            PhysicalSize::new(config.window_width, config.window_height),
+        );
+
+        let inputs = Input::new();
+
+        Self {
+            config,
+            window: None,
+            context: Some(FrameContext::new(graphics, inputs)),
+            backend: None,
+            last_frame_time: Instant::now(),
+            input_stepped: false,
+            running: true,
+        }
+    }
+}
+
+#[cfg(feature = "extension")]
+impl Runtime {
+    pub fn new(mut config: Config) -> Self {
+        let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
+
+        let mut extensions = std::mem::take(&mut config.extensions);
+        extensions.iter_mut().for_each(|ext| ext.on_init());
+
+        let graphics = Graphics::new(
+            logical_size,
+            PhysicalSize::new(config.window_width, config.window_height),
+        );
+
+        let inputs = Input::new();
+
+        Self {
+            config,
+            window: None,
+            context: Some(FrameContext::new(graphics, inputs)),
+            backend: None,
+            last_frame_time: Instant::now(),
+            input_stepped: false,
+            running: true,
+            extensions,
+        }
+    }
+}
+
+impl ApplicationHandler for Runtime {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         let config = &self.config;
 
@@ -105,7 +154,12 @@ where
         let physical_size = window.inner_size();
         let logical_size = LogicalSize::new(config.logical_width, config.logical_height);
 
-        self.backend = Some(PixelsBackend::new(&window, physical_size, logical_size, config.letterboxing));
+        self.backend = Some(PixelsBackend::new(
+            &window,
+            physical_size,
+            logical_size,
+            config.letterboxing,
+        ));
         self.window = Some(window);
     }
 
@@ -115,7 +169,6 @@ where
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        // Process keyboard events
         if let WindowEvent::KeyboardInput { event, .. } = &event {
             self.context
                 .as_mut()
@@ -127,10 +180,12 @@ where
         if self.get_input_helper().process_window_event(&event) {
             let context = self.context.as_mut().unwrap();
             let renderer = self.backend.as_mut().unwrap();
-            renderer.render(context.gfx.commands())
+            renderer.render(context.gfx.commands());
         }
+
         match event {
             WindowEvent::CloseRequested => {
+                self.running = false;
                 event_loop.exit();
             }
             WindowEvent::Resized(physical_size) => {
@@ -140,7 +195,6 @@ where
 
                 if let Some(renderer) = &mut self.backend {
                     renderer.resize_window(physical_size);
-                    // Sync new logical size to graphics context
                     let (lw, lh) = renderer.logical_size();
                     let ctx = self.context.as_mut().unwrap();
                     ctx.gfx.set_logical_size(lw, lh);
@@ -150,7 +204,6 @@ where
                 ctx.gfx.window_width = physical_size.width;
                 ctx.gfx.window_height = physical_size.height;
             }
-
             _ => (),
         }
     }
@@ -164,7 +217,6 @@ where
         self.get_input_helper().process_device_event(&event);
     }
 
-    // Mark frame start for input handling
     fn new_events(&mut self, _: &ActiveEventLoop, _: winit::event::StartCause) {
         if !self.input_stepped {
             self.get_input_helper().step();
@@ -172,50 +224,6 @@ where
         }
     }
 
-    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-        if let Some(win) = &self.window {
-            let elapsed = self.last_frame_time.elapsed();
-
-            // Calculate frame timing
-            let should_run = if let Some(target_fps) = self.config.target_fps {
-                elapsed >= Duration::from_secs_f64(1.0 / target_fps as f64)
-            } else {
-                true
-            };
-
-            if should_run {
-                let mut context = self.context.as_mut().unwrap();
-                context.dt = elapsed.as_secs_f64().min(0.1);
-                self.last_frame_time = Instant::now();
-
-                context.inputs.update_mouse_mapping(&context.gfx);
-                context.gfx.begin_frame();
-                
-
-                #[cfg(feature = "extension")]
-                for ext in &mut self.extensions{
-                    ext.pre_draw(&mut context);
-                }
-
-                (self.draw_fn)(&mut context);
-
-                #[cfg(feature = "extension")]
-                for ext in &mut self.extensions{
-                    ext.post_draw(&mut context);
-                }
-                context.inputs.helper.end_step();
-                context.inputs.reset_transient_state();
-
-                // Flag Reset for the new frame
-                self.input_stepped = false;
-
-                win.request_redraw();
-            } else if let Some(target_fps) = self.config.target_fps {
-                let frame_duration = Duration::from_secs_f64(1.0 / target_fps as f64);
-                event_loop.set_control_flow(winit::event_loop::ControlFlow::WaitUntil(
-                    Instant::now() + (frame_duration - elapsed),
-                ));
-            }
-        }
-    }
+    // about_to_wait is now a no-op — the caller drives the frame via begin/end_frame
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {}
 }
