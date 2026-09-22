@@ -21,7 +21,7 @@ use crate::runtime::Runtime;
 /// let mut window = Window::new(Config::default());
 ///
 /// while window.is_running() {
-///     let ctx = window.begin_frame();
+///     let ctx = window.next_frame();
 ///     ctx.graphics().clear(Color::BLACK);
 ///     ctx.graphics().rect((10, 10), (50, 50), Color::RED);
 ///     window.end_frame();
@@ -52,6 +52,13 @@ impl Window {
     ///
     /// Returns `None` if the frame should be skipped (e.g. FPS cap not reached yet).
     /// Calling unwrap on this method would probably result in a crash cause the window is not initialized.
+    /// # Example
+    /// ```rust
+    /// while let Some(frame) = win.begin_frame() {
+    ///     frame.graphics().clear(Color::BLACK);
+    ///     win.end_frame();
+    /// }
+    /// ```
     pub fn begin_frame(&mut self) -> Option<&mut FrameContext> {
         // Pump the event loop once to process window/input events
         self.event_loop
@@ -61,16 +68,8 @@ impl Window {
     }
     /// Block until the next frame is ready and return it.
     ///
-    /// This is the simplest way to drive the loop — it handles FPS capping
+    /// This is the simplest way to drive the loop it handles FPS capping
     /// and initialization internally, returning `None` only when the window closes.
-    ///
-    /// # Example
-    /// ```rust
-    /// while let Some(frame) = win.next_frame() {
-    ///     frame.graphics().clear(Color::BLACK);
-    ///     win.end_frame();
-    /// }
-    /// ```
     pub fn next_frame(&mut self) -> &mut FrameContext {
     loop {
         if self.begin_frame().is_some() {

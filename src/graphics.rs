@@ -1,7 +1,7 @@
 use winit::dpi::{LogicalSize, PhysicalSize};
 
-use crate::Color;
 use crate::vector::Vec2;
+use crate::Color;
 
 pub enum DrawCommand {
     Clear(Color),
@@ -112,8 +112,8 @@ impl Graphics {
             color,
         });
     }
-    // Draw a raw pixel buffer at `pos`.
-    /// `pixels` must be exactly `width * height` colors in row-major order (left→right, top→bottom).
+    // /Draw a raw pixel buffer at `pos`.
+    /// `pixels` must be exactly `width * height` colors in row-major order (left -> right, top -> bottom).
     /// Panics in debug if the slice length doesn't match.
     pub fn blit(&mut self, pos: impl Into<Vec2>, width: u32, height: u32, pixels: &[Color]) {
         debug_assert_eq!(
@@ -219,5 +219,8 @@ impl Graphics {
             text: text.into(),
             color,
         });
+    }
+    pub fn submit(&mut self, commands: impl IntoIterator<Item = DrawCommand>) {
+        self.commands.extend(commands);
     }
 }

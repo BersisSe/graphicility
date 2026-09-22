@@ -35,7 +35,7 @@ pub mod extensions;
 
 use std::error::Error;
 
-pub use graphics::Graphics;
+pub use graphics::{Graphics, DrawCommand};
 pub use context::FrameContext;
 pub use color::Color;
 pub use config::Config;
