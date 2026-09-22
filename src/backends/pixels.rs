@@ -262,36 +262,31 @@ impl Backend for PixelsBackend {
                     let (x, y) = pos.as_u32_tuple();
                     self.set_pixel(x, y, *color);
                 }
-                DrawCommand::DrawBlit {
-                    pos,
-                    width,
-                    height,
-                    pixels,
-                } => {
+                DrawCommand::DrawBlit { pos, width, height, pixels } => {
                     let frame = self.pixels.frame_mut();
-                    
-
+                
+                    // SAFETY: Color is #[repr(C)] { r: u8, g: u8, b: u8, a: u8 } with no
+                    // padding, so a &[Color] and a &[u8] of 4x the length share layout.
+                    let px_bytes: &[u8] = unsafe {
+                        std::slice::from_raw_parts(pixels.as_ptr() as *const u8, pixels.len() * 4)
+                    };
+                
                     for y in 0..*height {
                         let dst_y = pos.y as u32 + y;
                         if dst_y >= self.logic_height {
                             break;
                         }
-
-                        let row_offset = (dst_y * self.logic_width) as usize;
-
-                        for x in 0..*width {
-                            let dst_x = pos.x as u32 + x;
-                            if dst_x >= self.logic_width {
-                                break;
-                            }
-
-                            let src = pixels[(y * width + x) as usize];
-                            let dst = (row_offset + dst_x as usize) * 4;
-                            frame[dst] = src.r;
-                            frame[dst + 1] = src.g;
-                            frame[dst + 2] = src.b;
-                            frame[dst + 3] = src.a;
+                        let dst_x_start = pos.x as u32;
+                        let copy_w = (*width).min(self.logic_width.saturating_sub(dst_x_start)) as usize;
+                        if copy_w == 0 {
+                            continue;
                         }
+                
+                        let dst_offset = ((dst_y * self.logic_width + dst_x_start) as usize) * 4;
+                        let src_offset = (y * width) as usize * 4;
+                
+                        frame[dst_offset..dst_offset + copy_w * 4]
+                            .copy_from_slice(&px_bytes[src_offset..src_offset + copy_w * 4]);
                     }
                 }
                 DrawCommand::Circle {
