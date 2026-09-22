@@ -112,7 +112,7 @@ impl Graphics {
             color,
         });
     }
-    // /Draw a raw pixel buffer at `pos`.
+    /// Draw a raw pixel buffer at `pos`.
     /// `pixels` must be exactly `width * height` colors in row-major order (left -> right, top -> bottom).
     /// Panics in debug if the slice length doesn't match.
     pub fn blit(&mut self, pos: impl Into<Vec2>, width: u32, height: u32, pixels: &[Color]) {
@@ -132,6 +132,55 @@ impl Graphics {
             pixels: pixels.to_vec(),
         });
     }
+    /// Draw a raw RGB(A) byte buffer at `pos`, skipping the `&[Color]` conversion
+    /// step callers would otherwise need to do by hand.
+    ///
+    /// `pixels` must be exactly `width * height * channels` bytes, row-major,
+    /// left->right top->bottom. `channels` is 3 for RGB or 4 for RGBA; alpha is
+    /// assumed fully opaque (255) when `channels == 3`.
+    /// Panics in debug if the slice length doesn't match.
+    pub fn blit_bytes(
+        &mut self,
+        pos: impl Into<Vec2>,
+        width: u32,
+        height: u32,
+        channels: u8,
+        pixels: &[u8],
+    ) {
+        debug_assert!(
+            channels == 3 || channels == 4,
+            "blit_bytes: channels must be 3 (RGB) or 4 (RGBA)"
+        );
+        debug_assert_eq!(
+            pixels.len(),
+            (width * height) as usize * channels as usize,
+            "blit_bytes: pixels.len() must equal width * height * channels"
+        );
+        if width == 0 || height == 0 {
+            return;
+        }
+    
+        let pixel_count = (width * height) as usize;
+        let mut colors = Vec::with_capacity(pixel_count);
+    
+        if channels == 4 {
+            for chunk in pixels.chunks_exact(4) {
+                colors.push(Color::rgba(chunk[0], chunk[1], chunk[2], chunk[3]));
+            }
+        } else {
+            for chunk in pixels.chunks_exact(3) {
+                colors.push(Color::rgba(chunk[0], chunk[1], chunk[2], 255));
+            }
+        }
+    
+        self.commands.push(DrawCommand::DrawBlit {
+            pos: pos.into(),
+            width,
+            height,
+            pixels: colors,
+        });
+    }
+    
     /// Draw a filled Rectangle on `pos` with a given `size`.
     pub fn rect_lines(&mut self, pos: impl Into<Vec2>, size: impl Into<Vec2>, color: Color) {
         let p = pos.into();
