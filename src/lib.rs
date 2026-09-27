@@ -77,9 +77,9 @@ where
 ///
 /// let config = Config::builder()
 ///     .with_title("My App")
-///     .set_window_size((1024, 768))
-///     .set_logical_size((800, 600))
-///     .set_resizeable(true)
+///     .with_window_size((1024, 768))
+///     .with_logical_size((800, 600))
+///     .resizeable(true)
 ///     .build();
 ///
 /// run_with(config, |ctx| {
